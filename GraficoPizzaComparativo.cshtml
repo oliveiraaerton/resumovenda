@@ -1,0 +1,87 @@
+@{
+	Layout="~/Layout/_SiteLayout2.cshtml";
+
+    string datainicialCom = (string) Session["datainicialCom"]; //"01/06/2018";
+    string datafinalCom = (string) Session["datafinalCom"]; //"24/06/2018";
+	string loja = (string) Session["loja"];
+
+	string lojaStr = String.Empty;
+	
+    Conexao c = new Conexao(loja);
+	Random rnd = new Random();
+	
+    DateTime inicialCom = DateTime.Parse(c.dataTostring(datainicialCom));
+    DateTime finalCom = DateTime.Parse(c.dataTostring(datafinalCom));
+
+	List<Secao> secoes = c.sqlSecao();
+
+	decimal somaTotal=0;
+    List<VendaDiaria> comparativo = c.relatorioDiario(loja, inicialCom, finalCom);
+}
+
+<div class="content-wrapper">
+    <div class="float-left">        
+        <h1> <img alt="(85)86266479 - Aerton" height="120px" width="220px" src="~/content/images/logoEmpresa.png"/> Resumo Comparativo de Vendas @lojaStr</h1>
+    </div>
+</div>
+<div class="container">
+	<label>Grafico Periodo de @inicialCom.ToString("dd/MM/yyyy") a @finalCom.ToString("dd/MM/yyyy")</label>
+	<canvas id="myChart" width="1600" height="900"></canvas>
+</div>
+
+
+<script>
+// Our labels along the x-axis
+
+@foreach(VendaDiaria v in comparativo)
+{
+	somaTotal+=v.valor;
+}
+
+
+var config  = {
+	type: 'pie',
+	data: {
+		datasets: [{
+			data: [
+			@foreach(VendaDiaria v in comparativo)
+			{
+			rnd.Next();
+			<text>
+				"@v.valor.ToString().Replace(",",".")",
+			</text>
+			}
+			],
+			backgroundColor: [
+			@foreach(VendaDiaria v in comparativo)
+			{
+			<text>			
+				"@c.randomcolor(rnd)",
+			</text>
+			}
+			],
+			label: 'Resumo Por Secao'
+		}],
+		labels: [
+		@foreach(VendaDiaria v in comparativo)
+		{
+			string percent = (v.valor/somaTotal).ToString("p");
+			<text>
+				"@v.secdes - @percent",
+			</text>
+		}
+		]
+	},
+	options: {
+		responsive: true
+	}
+};
+	
+	
+		window.onload = function() {
+			var ctx = document.getElementById("myChart").getContext('2d');
+			window.myPie = new Chart(ctx, config);
+		};
+
+
+</script>

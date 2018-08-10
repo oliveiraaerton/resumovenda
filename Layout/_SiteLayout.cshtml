@@ -1,0 +1,107 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="utf-8">
+
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Relatórios Gerenciais</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="~/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="~/css/simple-sidebar.css" rel="stylesheet">
+    <style>
+        .font-large{
+            font-size: 60px;
+        }
+        .font-small{
+            font-size: 12px;
+        }
+
+        @@page {
+            size: auto;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <ul class="sidebar-nav">
+                <li class="sidebar-brand">
+                    <a href=@Href("~/Default.cshtml")>
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <a href="@Href("~/GravarVendaDiaria.cshtml")">Gravar Venda Diária</a>
+                </li>
+                <li>
+                    <a href="@Href("~/ValidarDias.cshtml")">Validar Gravação</a>
+                </li>
+                <li>
+                    <a href="@Href("~/GerarRelatorio.cshtml")">Venda Por Seção</a>
+                </li>
+                <li>
+                    <a href="@Href("~/RelatorioPorLoja.cshtml")">Venda Por Loja</a>
+                </li>
+                <li>
+                    <a href="@Href("~/CompraPorLoja.cshtml")">Compra Geral Por Loja</a>
+                </li>
+                <li>
+                    <a href="@Href("~/CompraEfetivaPorLoja.cshtml")">Compra Efetiva Por Loja</a>
+                </li>
+                <li>
+                    <a href="@Href("~/GerarRelatorioDiario.cshtml")">Venda Diário Por Loja</a>
+                </li>
+                <li>
+                    <a href="@Href("~/RecargaPorLoja.cshtml")">Recarga Por Loja</a>
+                </li>
+                <li>
+                    <a href="@Href("~/GerarCVQ.cshtml")">Compra X Venda X Quebra</a>
+                </li>
+                <li>
+                    <a href="@Href("~/CompraVenda.cshtml")">Compra X Venda</a>
+                </li>
+                <li>
+                    <a href="@Href("~/Contato.cshtml")">Contato</a>
+                </li>
+            </ul>
+        </div>
+        <!-- /#sidebar-wrapper -->
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+   
+                <a href="#menu-toggle"  id="menu-toggle"> <img alt="(85)98626.6479 - Aerton" height="50px" width="100px" src="~/content/images/logoEmpresa.png"/></a> 
+                @RenderBody()                
+          
+        </div>
+        <!-- /#page-content-wrapper -->                
+
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="~/vendor/jquery/jquery.min.js"></script>
+    <script src="~/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Menu Toggle Script -->
+    <script>
+    $("#menu-toggle").click(function(e) {
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
+    });
+    </script>
+
+</body>
+
+</html>

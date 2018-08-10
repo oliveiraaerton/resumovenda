@@ -1,0 +1,26 @@
+@{
+    Layout="~/Layout/_SiteLayout.cshtml";   
+
+
+}
+
+
+<h1>Validar Grava&ccedil;&atilde;o Di&aacute;ria</h1>
+    <div>
+        <form method="post" action="~/ListarDias.cshtml">
+            <table style="border: 0px;" class="table">
+                <tr>
+                    <td style="font-size: 14px;">Per&iacute;odo de Valida&ccedil;&atilde;o:</td>
+                    <td style="font-size: 14px;">De: <input type="date" name="datainicial" id="datainicial"/></td>
+                    <td>At&eacute;:</td>
+                    <td><input type="date" name="datafinal" id="datafinal" required/></td>
+                </tr>
+                </tr>
+
+                <tr>
+                    <td><input type="submit" name="relatorio" id="relatorio" value="Validar" class="btn btn-medium btn-success" />                    
+                    <a href="@Href("~/Default.cshtml")" class="btn btn-medium btn-success">Voltar</a> 
+                </tr>
+            </table>
+        </form>
+    </div>

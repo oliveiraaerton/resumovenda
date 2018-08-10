@@ -1,0 +1,294 @@
+﻿@{
+	Layout="~/Layout/_SiteLayout.cshtml";
+	String loja = (string)Session["loja"];
+	String ano= (string)Session["ano"];
+	String mesAntesAtras = DateTime.Now.AddMonths(-2).ToString("MMMM").ToUpper();
+	String mesAtras = DateTime.Now.AddMonths(-1).ToString("MMMM").ToUpper();
+	String mesAtual = DateTime.Now.ToString("MMMM").ToUpper();
+	String mesAfrente = DateTime.Now.AddMonths(1).ToString("MMMM").ToUpper();
+	
+	List<String> meses = new List<String>();	
+	meses.Add(mesAntesAtras);
+	meses.Add(mesAtras);
+	meses.Add(mesAtual);
+	meses.Add(mesAfrente);
+	
+	Conexao c = new Conexao();
+	String lojaStr = String.Empty;
+
+	decimal totalValorRecargaAtual = 0;
+	decimal totalValorRecargaAtras = 0;
+	
+	if(loja=="000000")
+	{
+		lojaStr = "Geral";
+	}
+	else
+	{
+		switch(loja){
+			case "000001": lojaStr = "Loja Granja Portugal";break;
+			case "000002": lojaStr = "Loja Granja Lisboa";break;
+			case "000003": lojaStr = "Loja Vila Velha";break;
+			case "000004": lojaStr = "Loja Curva da Viúva";break;
+			case "000006": lojaStr = "Loja José Walter 3a Etapa";break;
+		}
+	}		
+}
+<style>
+	body{
+		font-name: 'Arial Narrow';
+	}
+	.cabecalho{
+		font-size: 10px;
+		width: 200px;		
+	}
+	.invert{
+		background-color: black; color: white;
+	}
+	.semborda{
+		border:1px solid White;
+	}
+	.valor {
+		background-color: LightGray; color: Black; font-size:12px; text-align: center;
+	}	
+	.resumo {
+		background-color: black; color: white; font-size:12px; text-align: center;
+	}
+	table {
+	 table-layout:fixed;
+	 width:100%;
+	 border:1px solid Black;
+	 word-wrap:break-word;
+	 font-size: 12px;
+	}	
+	tr, td, th {
+		border: 1px solid Black;
+	}
+	tcaption {
+		font-size: 20px; text-align: center;
+	}
+
+}	
+</style>
+
+<div class="col-md-12">
+	<h3 colspan="17" class="invert" style="text-align: center;">Relatório Diário de Venda - @lojaStr</h3>
+	<table>
+		<tr>
+		@foreach(var m in meses)
+		{
+			if(mesAfrente.ToUpper()!= m)
+			{
+				<th style="text-align: center; width: 6%;" class="invert" COLSPAN="2">@ano</th>
+				<th COLSPAN="3" style="text-align: center; width:22%;">@m</th>
+			}
+			else
+			{
+				<th COLSPAN="2" style="text-align: center;background-color: LightGray; font-weight: bold; width: 16%;">@mesAtras.ToUpper()</th>			
+			}
+		}
+		</tr>
+		
+		<tr>
+		@foreach(var m in meses)
+		{
+			if(mesAfrente.ToUpper()!= m)
+			{
+				<th class="cabecalho" colspan="2">DIA DA SEMANA</th>
+				<th class="cabecalho">VALOR</th>
+				<th class="cabecalho">CLIENTES</th>
+				<th class="cabecalho">T. MÉDIO</th>
+			}
+			else
+			{
+				<th class="cabecalho" style="background-color: LightGray; font-weight: bold;">DIFERENÇA</th>
+				<th class="cabecalho" style="background-color: LightGray; font-weight: bold;">MESMO PERÍODO</th>
+			}
+		}
+		</tr>
+		
+		@for(int i=1; i<32; i++)
+		{
+			<tr>
+				@foreach(var m in meses)
+				{
+					string semana = c.retornaSemana(i, m, ano);
+					if(mesAfrente.ToUpper()!= m)
+					{
+						decimal venda = c.buscarVenda(i, m, ano, loja);
+						decimal vendaRecarga = c.buscarVendaRecarga(i, m, ano, loja);
+						decimal cliente = decimal.Parse(c.buscarCliente(i, m, ano, loja).ToString());
+						decimal ticket = 0;
+						try{
+							ticket = venda/cliente;
+						} catch {
+							ticket = 0;
+						}
+						<td style="text-align: center; background-color: LightGray; font-weight: bold; width: 3%;">@if(!String.IsNullOrEmpty(semana)) { <text> DIA @i </text> }</td>
+						<td style="text-align: center; background-color: LightGray; font-weight: bold; width: 3%;">@if(!String.IsNullOrEmpty(semana)) { <text> @semana.ToUpper() </text> }</td>
+						<td style="text-align: right; width: 8%;">@if(!String.IsNullOrEmpty(semana)) { <text> @vendaRecarga.ToString("c") </text> }</td>
+						<td style="text-align: right; width: 7%;">@if(!String.IsNullOrEmpty(semana)) { <text> @cliente </text> }</td>
+						<td style="text-align: right; width: 7%;">@if(!String.IsNullOrEmpty(semana)) { <text> @ticket.ToString("c") </text> }</td>
+					}
+					else if(i<DateTime.Now.Day)
+					{
+						decimal vendaRecarga = c.buscarVendaRecarga(i, mesAtual, ano, loja);
+						decimal vendaRecargaAtras = c.buscarVendaRecarga(i, mesAtras, ano, loja);
+						decimal diferenca = vendaRecarga - vendaRecargaAtras;
+						totalValorRecargaAtras+=vendaRecargaAtras;
+						totalValorRecargaAtual+=vendaRecarga;
+						<td style="text-align: right; width: 8%;">@if(!String.IsNullOrEmpty(semana)) { <text> @diferenca.ToString("c") </text> }</td>
+						<td style="text-align: right; width: 8%;">@if(!String.IsNullOrEmpty(semana)) { <text> @vendaRecargaAtras.ToString("c") </text> }</td>
+					}
+					else
+					{
+						<td style="text-align: right;">R$ 0,00 </td>
+						<td style="text-align: right;">R$ 0,00 </td>
+					}
+				}
+			</tr>
+		}
+		
+		<tr>
+			@foreach(var m in meses)
+			{
+				if(mesAfrente.ToUpper()!= m)
+				{
+					decimal totalValor = c.buscatotalValor(m, ano, loja);
+					decimal totalValorRecarga = c.buscatotalValorRecarga(m, ano, loja);
+					decimal totalCliente = decimal.Parse(c.buscatotalCliente(m, ano, loja).ToString());
+					decimal media = 0;
+					try 
+					{
+						media = totalValor/totalCliente;
+					} catch {
+						media = 0;
+					}
+					<th style="text-align: center; font-weight: bold; font-size: 14px;" class="invert" COLSPAN="2">TOTAL</th>
+					<td style="text-align: right; font-weight: bold; font-size: 14px;background-color: LightGray;">@totalValorRecarga.ToString("c")</td>
+					<td style="text-align: right; font-weight: bold; font-size: 14px;background-color: LightGray;">@totalCliente</td>
+					<td style="text-align: right; font-weight: bold; font-size: 14px;background-color: LightGray;">@media.ToString("c")</td>
+				}	
+				else
+				{
+					decimal diferenca = totalValorRecargaAtual - totalValorRecargaAtras;
+					<td style="text-align: right; font-size: 14px;font-weight: bold;background-color: LightGray;">@diferenca.ToString("c") </td>
+					<td style="text-align: right; font-size: 14px;font-weight: bold;background-color: LightGray;">@totalValorRecargaAtras.ToString("c")</td>
+				}				
+			}
+		</tr>
+		<TR></TR>
+		<tr>
+			<td class="semborda"></td><td class="semborda"></td>
+			<td class="resumo">@mesAntesAtras</td>
+			<td class="semborda"></td>
+			<td class="semborda"></td>
+			<td class="semborda"></td><td class="semborda"></td>
+			<td class="resumo">@mesAtras</td>
+			<td class="semborda"></td>
+			<td class="semborda"></td>
+			<td class="semborda"></td><td class="semborda"></td>
+			<td class="resumo">@mesAtual</td>
+			<td class="semborda"></td>
+			<td class="semborda"></td>
+			<td colspan="2" class="resumo">TOTAL DE CLIENTES</td>
+		</tr>
+		<tr>
+			<td class="semborda"></td><td class="semborda"></td>
+			<td class="resumo">QTDE DIAS</td>
+			<td class="semborda"></td>
+			<td class="semborda"></td>
+			<td class="semborda"></td><td class="semborda"></td>
+			<td class="resumo">QTDE DIAS</td>
+			<td class="semborda"></td>
+			<td class="semborda"></td>
+			<td class="semborda"></td><td class="semborda"></td>
+			<td class="resumo">QTDE DIAS</td>
+			<td class="semborda"></td>
+			<td class="semborda"></td>
+			<td class="resumo">MÊS ATUAL</td>
+			<td class="resumo">MÊS ANTERIOR</td>
+		</tr>
+		<tr>
+			<td class="semborda"></td><td class="semborda"></td>
+			<td class="valor">31 DIAS</td>
+			<td class="semborda"></td>
+			<td class="semborda"></td>
+			<td class="semborda"></td><td class="semborda"></td>
+			<td class="valor">30 DIAS</td>
+			<td class="semborda"></td>
+			<td class="semborda"></td>
+			<td class="semborda"></td><td class="semborda"></td>
+			<td class="valor">17 DIAS</td>
+			<td class="semborda"></td>
+			<td class="semborda"></td>
+			<td class="valor">18262</td>
+			<td class="valor">31722</td>
+		</tr>
+		<tr>
+			<td class="semborda"></td><td class="semborda"></td>
+			<td class="resumo">MÉDIA DIÁRIA</td>
+			<td class="semborda"></td>
+			<td class="semborda"></td>
+			<td class="semborda"></td><td class="semborda"></td>
+			<td class="resumo">MÉDIA DIÁRIA</td>
+			<td class="semborda"></td>
+			<td class="semborda"></td>
+			<td class="semborda"></td><td class="semborda"></td>
+			<td class="resumo">MÉDIA DIÁRIA</td>
+			<td class="semborda"></td>
+			<td class="semborda"></td>
+			<td class="semborda"></td>
+			<td class="semborda"></td>
+		</tr>
+		<tr>
+			<td class="semborda"></td><td class="semborda"></td>
+			<td class="valor">R$ 32.475,56</td>
+			<td class="semborda"></td>
+			<td class="semborda"></td>
+			<td class="semborda"></td><td class="semborda"></td>
+			<td class="valor">R$ 32.157,26</td>
+			<td class="semborda"></td>
+			<td class="semborda"></td>
+			<td class="semborda"></td><td class="semborda"></td>
+			<td class="valor">R$ 35.390,58</td>
+			<td class="semborda"></td>
+			<td class="semborda"></td>
+			<td class="semborda"></td>
+			<td class="semborda"></td>
+		</tr>
+		<tr>
+			<td class="semborda"></td><td class="semborda"></td>
+			<td class="resumo">TICKET MÉDIO</td>
+			<td class="semborda"></td>
+			<td class="semborda"></td>
+			<td class="semborda"></td><td class="semborda"></td>
+			<td class="resumo">TICKET MÉDIO</td>
+			<td class="semborda"></td>
+			<td class="semborda"></td>
+			<td class="semborda"></td><td class="semborda"></td>
+			<td class="resumo">TICKET MÉDIO</td>
+			<td class="semborda"></td>
+			<td class="semborda"></td>
+			<td class="semborda"></td>
+			<td class="semborda"></td>
+		</tr>
+		<tr>
+			<td class="semborda"></td><td class="semborda"></td>
+			<td class="valor">R$ 31,06</td>
+			<td class="semborda"></td>
+			<td class="semborda"></td>
+			<td class="semborda"></td><td class="semborda"></td>
+			<td class="valor">R$ 30,13</td>
+			<td class="semborda"></td>
+			<td class="semborda"></td>
+			<td class="semborda"></td><td class="semborda"></td>
+			<td class="valor">R$ 31,88</td>
+			<td class="semborda"></td>
+			<td class="semborda"></td>
+			<td class="semborda"></td>
+			<td class="semborda"></td>
+		</tr>
+	</table>
+</div>
+

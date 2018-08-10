@@ -1,0 +1,42 @@
+﻿@{
+    Layout="~/Layout/_SiteLayout.cshtml";   
+	if(IsPost)
+	{
+        Session.Clear();
+		Session["loja"]=Request.Form["loja"];
+		Session["ano"]=Request.Form["ano"];
+		Response.Redirect(@Href("~/ViewRelatorioDiario"));
+
+	}
+
+}
+
+<h1>Comparativo de Vendas Por Se&ccedil&atildeo</h1>
+    <div>
+        <form method="post">
+            <table style="border: 0px;" class="table">
+                <tr>
+                    <td>Loja:</td>
+                    <td>
+                        <select id="loja" name="loja" required style="text-align: right;">
+                            <option value="">Escolha a loja</option>
+                            <option value="000000">Geral</option>
+                            <option value="000001">Loja 1</option>
+                            <option value="000002">Loja 2</option>
+                            <option value="000003">Loja 3</option>
+                            <option value="000004">Loja 4</option>
+                            <option value="000006">Loja 6</option>
+                        </select>
+                    </td>					
+                </tr>
+				<tr>
+					<td>Ano:</td>
+					<td><input type="number" min=2017 name="ano" id="ano" value="@DateTime.Now.Year" style="text-align: right;"/></td>
+				</tr>
+                <tr>
+                    <td><input type="submit" name="relatorio" id="relatorio" value="Relatorio" class="btn btn-medium btn-success" />
+                    <a href="@Href("~/Default.cshtml")" class="btn btn-medium btn-success">Voltar</a> 
+                </tr>
+            </table>
+        </form>
+    </div>

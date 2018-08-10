@@ -1,0 +1,87 @@
+@{
+	Layout="~/Layout/_SiteLayout2.cshtml";
+
+    string datainicialCom = (string) Session["datainicialRef"]; //"01/06/2018";
+    string datafinalCom = (string) Session["datafinalRef"]; //"24/06/2018";
+	string loja = (string) Session["loja"];
+
+	string lojaStr = String.Empty;
+	List<String> diaadia = new List<String>();
+	
+    Conexao c = new Conexao(loja);
+
+    DateTime inicialCom = DateTime.Parse(c.dataTostring(datainicialCom));
+    DateTime finalCom = DateTime.Parse(c.dataTostring(datafinalCom));
+
+
+	List<Secao> secoes = c.sqlSecao();
+
+	Random rnd = new Random();
+	
+	for (DateTime date = inicialCom; date <= finalCom; date = date.AddDays(1.0)){
+		diaadia.Add(date.ToString("dd/MM/yyyy"));
+	}
+}
+
+<div class="content-wrapper">
+    <div class="float-left">        
+        <h1> <img alt="(85)86266479 - Aerton" height="120px" width="220px" src="~/content/images/logoEmpresa.png"/> Resumo Comparativo de Vendas @lojaStr</h1>
+    </div>
+</div>
+<div class="container">
+	<label>Grafico Periodo de @inicialCom.ToString("dd/MM/yyyy") a @finalCom.ToString("dd/MM/yyyy")</label>
+	<canvas id="myChart" width="1600" height="900"></canvas>
+</div>
+
+
+<script>
+// Our labels along the x-axis
+var dias = [];
+@foreach(Secao s in secoes)
+{
+	<text> var secao</text><text>@s.seccod = []; </text>
+}
+@foreach(String dia in diaadia)
+{
+	<text> dias.push("@dia"); </text>
+	foreach(Secao s in secoes)
+	{
+		<text> secao</text><text>@s.seccod</text><text>.push("@c.puxaVendaDia(loja, dia, s.seccod).ToString().Replace(",",".")"); </text>
+	}
+}
+
+
+var ctx = document.getElementById("myChart");
+var myChart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: dias,
+    datasets: [
+	@foreach(Secao s in secoes)
+	{
+		rnd.Next();
+		if(s.seccod=="20"){
+		<text>
+			{ 
+			  data: secao</text><text>@s.seccod,
+			  label: "@s.secdes",
+			  borderColor: "@c.randomcolor(rnd)",
+			  fill: false
+			}		
+		</text>
+		} else 
+		{
+		<text>
+		{ 
+		  data: secao</text><text>@s.seccod,
+		  label: "@s.secdes",
+		  borderColor: "@c.randomcolor(rnd)",
+		  fill: false
+		},
+		</text>
+		}
+	}
+    ]
+  }
+});
+</script>

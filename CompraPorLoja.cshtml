@@ -1,0 +1,84 @@
+@{
+    Layout="~/Layout/_SiteLayout.cshtml";   	
+	
+	if(IsPost)
+	{
+		Conexao c = new Conexao();
+		string datainicial = Request["datainicial"]; //"01/05/2018";
+		string datafinal = Request["datafinal"]; //"24/05/2018";
+
+		DateTime inicial = DateTime.Parse(c.dataTostring(datainicial));
+		DateTime final = DateTime.Parse(c.dataTostring(datafinal));
+	
+		List<RelatorioLoja> relatorios = c.relatorioCompra(inicial, final);
+		decimal[] total = new decimal[7];
+		total[1]=0;
+		total[2]=0;
+		total[3]=0;
+		total[4]=0;
+		total[6]=0;
+		decimal secao=0;
+		<div class="container">
+		<strong>	 <h1>Comparativo de Compra Geral Por Loja</h1>
+		@inicial.ToString("dd/MM/yyyy") a @final.ToString("dd/MM/yyyy")</strong></div>
+		<table class="table">
+			<tr>
+				<th>Codigo</th>
+				<th>Secao</th>
+				<th style="text-align:center">Loja 1</th>
+				<th style="text-align:center">Loja 2</th>
+				<th style="text-align:center">Loja 3</th>
+				<th style="text-align:center">Loja 4</th>
+				<th style="text-align:center">Loja 6</th>
+				<th style="text-align:center">TOTAL</th>
+			</tr>
+			@foreach(RelatorioLoja rl in relatorios)
+			{
+				secao=0;
+				<tr>
+					<td>@rl.seccod</td>
+					<td>@rl.secdes</td>
+					@foreach(Loja l in rl.lojas)
+					{
+						total[l.loja.AsInt()]+=l.valor;
+						secao+=l.valor;
+						<td style="text-align:right;">@l.valor.ToString("c")</td>
+					}
+					<td style="text-align:right; font-weight: bolder;">@secao.ToString("c")</td>
+				</tr>
+			}
+			<tr>
+				<td colspan="2" style="font-weight: bolder; text-align: right;">TOTAL</td>
+				<td style="font-weight: bolder; text-align: right;">@total[1].ToString("c")</td>
+				<td style="font-weight: bolder; text-align: right;">@total[2].ToString("c")</td>
+				<td style="font-weight: bolder; text-align: right;">@total[3].ToString("c")</td>
+				<td style="font-weight: bolder; text-align: right;">@total[4].ToString("c")</td>
+				<td style="font-weight: bolder; text-align: right;">@total[6].ToString("c")</td>
+				<td style="font-weight: bolder; text-align: right;">@((total[1]+total[2]+total[3]+total[4]+total[6]).ToString("c"))</td>
+			</tr>
+		
+		</table>
+
+	}
+    else 
+    {
+	 <h1>Comparativo de Compra Geral Por Loja</h1>
+     <div>
+        <form method="post">
+            <table style="border: 0px;" class="table table-bordered">
+                <tr>
+                    <td style="font-size: 14px;">Per&iacute;odo de Compra:</td>
+                    <td style="font-size: 14px;"><input type="date" name="datainicial" id="datainicial"/></td>
+                    <td style="font-size: 14px;">At&eacute;</td>
+                    <td style="font-size: 14px;"><input type="date" name="datafinal" id="datafinal"/></td>
+                </tr>
+
+                <tr>
+                    <td><input type="submit" name="relatorio" id="relatorio" value="Relatorio" class="btn btn-medium btn-success" />
+                    <a href="@Href("~/Default.cshtml")" class="btn btn-medium btn-success">Voltar</a> </td>
+                </tr>
+            </table>
+        </form>
+     </div>
+	}
+}

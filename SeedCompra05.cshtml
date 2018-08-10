@@ -1,0 +1,45 @@
+@{
+    List<DateTime> datas = new List<DateTime>();
+
+    DateTime inicial = DateTime.Parse("01/05/2018");datas.Add(inicial);
+
+    inicial = DateTime.Parse("02/05/2018"); datas.Add(inicial);
+    inicial = DateTime.Parse("03/05/2018"); datas.Add(inicial);
+    inicial = DateTime.Parse("04/05/2018"); datas.Add(inicial);
+    inicial = DateTime.Parse("05/05/2018"); datas.Add(inicial);
+    inicial = DateTime.Parse("06/05/2018"); datas.Add(inicial);
+    inicial = DateTime.Parse("07/05/2018"); datas.Add(inicial);
+    inicial = DateTime.Parse("08/05/2018"); datas.Add(inicial);
+    inicial = DateTime.Parse("09/05/2018"); datas.Add(inicial);
+    inicial = DateTime.Parse("10/05/2018"); datas.Add(inicial);
+    inicial = DateTime.Parse("11/05/2018"); datas.Add(inicial);
+    inicial = DateTime.Parse("12/05/2018"); datas.Add(inicial);
+    inicial = DateTime.Parse("13/05/2018"); datas.Add(inicial);
+    inicial = DateTime.Parse("14/05/2018"); datas.Add(inicial);
+    inicial = DateTime.Parse("15/05/2018"); datas.Add(inicial);
+    inicial = DateTime.Parse("16/05/2018"); datas.Add(inicial);
+    inicial = DateTime.Parse("17/05/2018"); datas.Add(inicial);
+    inicial = DateTime.Parse("18/05/2018"); datas.Add(inicial);
+    inicial = DateTime.Parse("19/05/2018"); datas.Add(inicial);
+    inicial = DateTime.Parse("20/05/2018"); datas.Add(inicial);
+    inicial = DateTime.Parse("21/05/2018"); datas.Add(inicial);
+    inicial = DateTime.Parse("22/05/2018"); datas.Add(inicial);
+    inicial = DateTime.Parse("23/05/2018"); datas.Add(inicial);
+    inicial = DateTime.Parse("24/05/2018"); datas.Add(inicial);
+    inicial = DateTime.Parse("25/05/2018"); datas.Add(inicial);
+    inicial = DateTime.Parse("26/05/2018"); datas.Add(inicial);
+    inicial = DateTime.Parse("27/05/2018"); datas.Add(inicial);
+    inicial = DateTime.Parse("28/05/2018"); datas.Add(inicial);
+    inicial = DateTime.Parse("29/05/2018"); datas.Add(inicial);
+    inicial = DateTime.Parse("30/05/2018"); datas.Add(inicial);
+    inicial = DateTime.Parse("31/05/2018"); datas.Add(inicial);
+	
+    foreach(DateTime dt in datas){
+        Conexao c1 = new Conexao("000000");
+        c1.gravarQuebraDiaria("000006", dt);
+        c1.gravarQuebraDiariaFLV("000006", dt);
+    	c1.Fecha();
+    }
+}
+
+

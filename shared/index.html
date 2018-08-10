@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Simple Sidebar - Start Bootstrap Template</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="css/simple-sidebar.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <ul class="sidebar-nav">
+                <li class="sidebar-brand">
+                    <a href=@Href("~/Default.cshtml")>
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <a href="@Href("~/GravarVendaDiaria.cshtml")">Gravar Venda Diária</a>
+                </li>
+                <li>
+                    <a href="@Href("~/ValidarDias.cshtml")">Validar Gravação Diária</a>
+                </li>
+                <li>
+                    <a href="@Href("~/GerarRelatorio.cshtml")">Comparativo de Venda Por Seção</a>
+                </li>
+                <li>
+                    <a href="@Href("~/RelatorioPorLoja.cshtml")">Comparativo de Venda Por Loja</a>
+                </li>
+                <li>
+                    <a href="@Href("~/GerarRelatorioDiario.cshtml")">Relatório Diário Por Loja</a>
+                </li>
+                <li>
+                    <a href="@Href("~/RecargaPorLoja.cshtml")">Relatório Recarga Por Loja</a>
+                </li>
+                <li>
+                    <a href="@Href("~/Contato.cshtml")">Contato</a>
+                </li>
+            </ul>
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                <h1>Resumo de Venda</h1>
+                <p>Relatórios Gerenciais de Venda, Recarga e CompraXVenda</p>
+                <p>Make sure to keep all page content within the <code>#page-content-wrapper</code>.</p>
+                <a href="#menu-toggle" class="btn btn-secondary" id="menu-toggle">Toggle Menu</a>
+            </div>
+        </div>
+        <!-- /#page-content-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Menu Toggle Script -->
+    <script>
+    $("#menu-toggle").click(function(e) {
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
+    });
+    </script>
+
+</body>
+
+</html>

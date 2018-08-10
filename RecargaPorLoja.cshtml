@@ -1,0 +1,230 @@
+@{
+    Layout="~/Layout/_SiteLayout.cshtml";   
+    <style>
+    	body{
+    		background-color:#66ccff;
+    	}
+    </style>	
+	
+	if(IsPost)
+	{
+		Conexao c = new Conexao();
+		string datainicial = Request["datainicial"]; //"01/05/2018";
+		string datafinal = Request["datafinal"]; //"24/05/2018";
+
+		DateTime inicial = DateTime.Parse(c.dataTostring(datainicial));
+		DateTime final = DateTime.Parse(c.dataTostring(datafinal));
+	
+		decimal[] total = new decimal[7];
+		decimal[] totalLucro = new decimal[7];
+
+		decimal percentual = 0;
+		decimal totalPercentual = 0;
+		decimal recarga = 0;
+		decimal totalRecarga = 0;
+		decimal totalGanho = 0;
+		int contador = 0;
+
+		total[1] = c.totalRecarga(inicial, final, "000001");
+		total[2] = c.totalRecarga(inicial, final, "000002");
+		total[3] = c.totalRecarga(inicial, final, "000003");
+		total[4] = c.totalRecarga(inicial, final, "000004");
+		total[5] = c.totalRecarga(inicial, final, "000006");
+
+
+		List<Claro> claro = new List<Claro>();
+		 c = new Conexao("000001");
+		claro.Add(c.totalRecargaClaro(inicial, final, "000001"));
+		 c = new Conexao("000002");
+		claro.Add(c.totalRecargaClaro(inicial, final, "000002"));
+		 c = new Conexao("000003");
+		claro.Add(c.totalRecargaClaro(inicial, final, "000003"));
+		 c = new Conexao("000004");
+		claro.Add(c.totalRecargaClaro(inicial, final, "000004"));
+		 c = new Conexao("000006");
+		claro.Add(c.totalRecargaClaro(inicial, final, "000006"));
+
+		List<Oi> oi = new List<Oi>();
+		 c = new Conexao("000001");
+		oi.Add(c.totalRecargaOi(inicial, final, "000001"));
+		 c = new Conexao("000002");
+		oi.Add(c.totalRecargaOi(inicial, final, "000002"));
+		 c = new Conexao("000003");
+		oi.Add(c.totalRecargaOi(inicial, final, "000003"));
+		 c = new Conexao("000004");
+		oi.Add(c.totalRecargaOi(inicial, final, "000004"));
+		 c = new Conexao("000006");
+		oi.Add(c.totalRecargaOi(inicial, final, "000006"));
+
+		List<Tim> tim = new List<Tim>();
+		 c = new Conexao("000001");
+		tim.Add(c.totalRecargaTim(inicial, final, "000001"));
+		 c = new Conexao("000002");
+		tim.Add(c.totalRecargaTim(inicial, final, "000002"));
+		 c = new Conexao("000003");
+		tim.Add(c.totalRecargaTim(inicial, final, "000003"));
+		 c = new Conexao("000004");
+		tim.Add(c.totalRecargaTim(inicial, final, "000004"));
+		 c = new Conexao("000006");
+		tim.Add(c.totalRecargaTim(inicial, final, "000006"));
+
+		List<Vivo> vivo = new List<Vivo>();
+		 c = new Conexao("000001");
+		vivo.Add(c.totalRecargaVivo(inicial, final, "000001"));
+		 c = new Conexao("000002");
+		vivo.Add(c.totalRecargaVivo(inicial, final, "000002"));
+		 c = new Conexao("000003");
+		vivo.Add(c.totalRecargaVivo(inicial, final, "000003"));
+		 c = new Conexao("000004");
+		vivo.Add(c.totalRecargaVivo(inicial, final, "000004"));
+		 c = new Conexao("000006");
+		vivo.Add(c.totalRecargaVivo(inicial, final, "000006"));
+
+		<div class="container btn-success"><a href="@Href("~/Default.cshtml")" class="btn btn-small"> 
+			<img alt="(85)9 8626.6479 - Aerton" height="100px" width="100px" src="~/content/images/logoEmpresa.png"/> </a> 
+			<strong><h1>Comparativo de Venda Por Loja</h1>@inicial.ToString("dd/MM/yyyy") a @final.ToString("dd/MM/yyyy")</strong>
+		</div>
+
+		<table class="table btn-danger">
+			<tr class="btn-primary">
+				<th style="text-align:center">Lojas -></th>
+				<th style="text-align:center">Loja 1</th>
+				<th style="text-align:center">Loja 2</th>
+				<th style="text-align:center">Loja 3</th>
+				<th style="text-align:center">Loja 4</th>
+				<th style="text-align:center">Loja 6</th>
+				<th style="text-align:center">TOTAL</th>
+			</tr>
+
+
+			@{ 
+			 percentual = 0;
+			 totalPercentual = 0;
+			 contador=0;
+			}
+			<tr>
+				<td  style="font-weight: bolder; text-align: right;">Claro</td>
+				@foreach(Claro g in claro)
+				{
+					contador+=1;
+					percentual = g.Percentual;
+					totalLucro[contador] += percentual; 
+					totalPercentual+=percentual;
+					<td style="font-weight: bolder; text-align: right;">@percentual.ToString("c")</td>
+				}			
+				<td style="font-weight: bolder; text-align: right;">@totalPercentual.ToString("c")</td>
+			</tr>
+
+
+			@{ 
+			 percentual = 0;
+			 totalPercentual = 0;
+			 contador=0;
+			}
+			<tr>
+				<td  style="font-weight: bolder; text-align: right;">Oi</td>
+				@foreach(Oi g in oi)
+				{
+					contador+=1;
+					percentual = g.Percentual;
+					totalLucro[contador] += percentual; 
+					totalPercentual+=percentual;
+					<td style="font-weight: bolder; text-align: right;">@percentual.ToString("c")</td>
+				}			
+				<td style="font-weight: bolder; text-align: right;">@totalPercentual.ToString("c")</td>
+			</tr>
+
+			@{ 
+			 percentual = 0;
+			 totalPercentual = 0;
+			 contador=0;
+			}
+			<tr>
+				<td  style="font-weight: bolder; text-align: right;">Tim</td>
+				@foreach(Tim g in tim)
+				{
+					contador+=1;
+					percentual = g.Percentual;
+					totalLucro[contador] += percentual; 
+					totalPercentual+=percentual;
+					<td style="font-weight: bolder; text-align: right;">@percentual.ToString("c")</td>
+				}			
+				<td style="font-weight: bolder; text-align: right;">@totalPercentual.ToString("c")</td>
+			</tr>
+
+
+			@{ 
+			 percentual = 0;
+			 totalPercentual = 0;
+			 contador=0;
+			 decimal totalPagoGeral = 0;
+			}
+			<tr>
+				<td  style="font-weight: bolder; text-align: right;">Vivo</td>
+				@foreach(Vivo g in vivo)
+				{
+					contador+=1;
+					percentual = g.Percentual;
+					totalLucro[contador] += percentual; 
+					totalPercentual+=percentual;
+					<td style="font-weight: bolder; text-align: right;">@percentual.ToString("c")</td>
+				}			
+				<td style="font-weight: bolder; text-align: right;">@totalPercentual.ToString("c")</td>
+			</tr>
+
+			<tr>
+				<td  style="font-weight: bolder; text-align: right;">RECARGA</td>
+				@for(int i=1; i<=5; i++) {
+					totalRecarga+=total[i];
+					recarga = total[i];
+					<td style="font-weight: bolder; text-align: right;">@recarga.ToString("c")</td>
+				}
+				
+				<td style="font-weight: bolder; text-align: right;">@totalRecarga.ToString("c")</td>
+			</tr>
+
+			<tr>
+				<td  style="font-weight: bolder; text-align: right;">VALOR RECEBIDO</td>
+				@for(int i=1; i<=5; i++) {
+					totalGanho+=totalLucro[i];
+					<td style="font-weight: bolder; text-align: right;">@totalLucro[i].ToString("c")</td>
+				}
+				
+				<td style="font-weight: bolder; text-align: right;">@totalGanho.ToString("c")</td>
+			</tr>	
+
+			<tr>
+				<td  style="font-weight: bolder; text-align: right;">VALOR PAGO</td>
+				@for(int i=1; i<=5; i++) {
+					decimal totalPago = total[i] - totalLucro[i];
+					totalPagoGeral+=totalPago;
+					<td style="font-weight: bolder; text-align: right;">@totalPago.ToString("c")</td>
+				}
+
+				<td style="font-weight: bolder; text-align: right;">@totalPagoGeral.ToString("c")</td>
+			</tr>
+		</table>
+
+	}
+    else 
+    {
+	 <h1>Comparativo de Recarga Por Loja</h1>
+     <div>
+        <form method="post">
+            <table style="border: 0px;" class="table table-bordered">
+                <tr>
+                    <td style="font-size: 14px;">Per&iacute;odo de Venda:</td>
+                    <td style="font-size: 14px;"><input type="date" name="datainicial" id="datainicial"/></td>
+                    <td style="font-size: 14px;">At&eacute;</td>
+                    <td style="font-size: 14px;"><input type="date" name="datafinal" id="datafinal"/></td>
+                </tr>
+
+                <tr>
+                    <td><input type="submit" name="relatorio" id="relatorio" value="Relatorio" class="btn btn-medium btn-success" />
+                    <a href="@Href("~/Default.cshtml")" class="btn btn-medium btn-success">Voltar</a> </td>
+                </tr>
+            </table>
+        </form>
+     </div>
+	}
+}

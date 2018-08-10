@@ -1,0 +1,51 @@
+@{
+    Layout="~/Layout/_SiteLayout.cshtml";   
+	
+	if(Request["datainicial"]!=null)
+	{
+		Session["datainicial"] = Request["datainicial"];	
+		Session["datafinal"] = Request["datafinal"];	
+	}
+    
+
+	decimal total = 0;
+	Conexao c = new Conexao();
+	List<Validar> validar = c.validardias(DateTime.Parse((string) Session["datainicial"]), DateTime.Parse((string) Session["datafinal"]), "000001");
+	decimal valor = 0;
+	string diaanterior = string.Empty;
+	<h2 class="label-warning">Valida&ccedil;&atilde;o das Vendas</h2>
+	<h3>Dia : Valor(R$) </h3>
+
+	if(Request["datainicial"]!=null)
+	{
+		for(DateTime dia = DateTime.Parse((string) Session["datainicial"]); dia<=DateTime.Parse((string) Session["datafinal"]); dia=dia.AddDays(1))
+		{
+			try {
+				valor = validar.Find(i=>i.diainicial==dia).valor;
+			}
+			catch{
+				valor=0;
+			}
+			if(valor==0)
+			{
+				<p>
+					<a href="@Href("~/GravarVenda.cshtml?dias=" + dia.ToString("yyyy-MM-dd"))">
+						@dia.ToString("dd/MM")
+					</a> : @valor.ToString("c")
+				</p> 
+			}
+			else
+			{
+				<p>@dia.ToString("dd/MM") : @valor.ToString("c")</p> 
+			}
+			
+			total+=valor;
+		}
+	}
+	
+	<hr>
+	<h4><strong>Total: @total.ToString("c")</strong></h4>
+	<hr>
+	<a href="@Href("~/Default.cshtml")" class="btn btn-medium btn-success">Voltar</a> 
+}
+

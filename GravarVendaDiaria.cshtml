@@ -1,0 +1,30 @@
+﻿@{
+    Layout="~/Layout/_SiteLayout.cshtml";
+    string padrao = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
+    if(IsPost){
+      padrao=DateTime.Parse(Request["dia"]).ToString("yyyy-MM-dd");
+  	  for(int i=1; i<7; i++){
+  			  if(i!=5){
+  				Conexao c = new Conexao(i.ToString("000000"));
+  				c.gravarDiaria(i.ToString("000000"), DateTime.Parse(Request["dia"]));      
+  			  }            
+  		}
+
+      <label class="alert-success">@DateTime.Parse(Request["dia"]).ToString("dd-MM-yyyy") - Gravado com sucesso</label>
+    }
+}
+
+<form class="form-signin" method="post">
+     <fieldset>
+         <legend>Gravar Venda Diária</legend>
+
+         <div class="form-label-group">
+             <label for="dia">Data de Geração</label>
+             <input type="date" class="form-control" id="dia" name="dia" required value=@padrao>
+         </div>
+
+         <div class="form-label-group">
+             <button type="submit" class="btn btn-lg btn-primary btn-block" default="true">Gravar</button>
+         </div>
+     </fieldset>
+ </form>

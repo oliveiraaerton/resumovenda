@@ -1,0 +1,227 @@
+﻿@{
+    Layout="~/Layout/_SiteLayout.cshtml";
+	
+    string datainicialRef = (string) Session["datainicialRef"]; //"01/05/2018";
+    string datafinalRef = (string) Session["datafinalRef"]; //"24/05/2018";
+
+    string datainicialCom = (string) Session["datainicialCom"]; //"01/06/2018";
+    string datafinalCom = (string) Session["datafinalCom"]; //"24/06/2018";
+	
+	string loja = (string) Session["loja"];
+
+	string lojaStr = String.Empty;
+	
+	if(loja=="000000")
+	{
+		lojaStr = "Geral";
+	}
+	else
+	{
+		switch(loja){
+			case "000001": lojaStr = "Loja Granja Portugal";break;
+			case "000002": lojaStr = "Loja Granja Lisboa";break;
+			case "000003": lojaStr = "Loja Vila Velha";break;
+			case "000004": lojaStr = "Loja Curva da Viúva";break;
+			case "000006": lojaStr = "Loja José Walter 3a Etapa";break;
+		}
+		//lojaStr = "Loja " + loja.AsInt();
+	}	
+
+    Conexao c = new Conexao(loja);
+
+    DateTime inicialRef = DateTime.Parse(c.dataTostring(datainicialRef));
+    DateTime finalRef = DateTime.Parse(c.dataTostring(datafinalRef));
+
+    DateTime inicialCom = DateTime.Parse(c.dataTostring(datainicialCom));
+    DateTime finalCom = DateTime.Parse(c.dataTostring(datafinalCom));
+
+    List<VendaDiaria> referencia  = c.relatorioDiario(loja, inicialRef, finalRef);
+    List<VendaDiaria> comparativo = c.relatorioDiario(loja, inicialCom, finalCom);
+
+    List<Secao> secoes = c.sqlSecao();
+    
+    decimal refSecao = 0;
+    decimal comSecao = 0;
+  
+    decimal divSecao = 0;
+
+    decimal totalRef = 0;
+    decimal totalCom = 0;
+ 
+    decimal taxaRef = 0;
+    decimal taxaCom = 0;
+
+    decimal recargaRef = 0;
+    decimal recargaCom = 0;
+
+    decimal cancelamentoRef = 0;
+    decimal cancelamentoCom = 0;
+
+    decimal totalGeralRef = 0;
+    decimal totalGeralCom = 0;
+	
+	
+
+    List<Relatorio> relatorios = new List<Relatorio>();
+    relatorios.Add(new Relatorio("CÓDIGO", "SEÇÕES", "De " + c.dataTostring(datainicialRef) + " Até " + c.dataTostring(datafinalRef), "De " + c.dataTostring(datainicialCom) + " Até " + c.dataTostring(datafinalCom), "DIF(R$)", "DIF(%)"));
+    foreach(Secao s in secoes)
+    {
+        try
+        {
+            refSecao = referencia.Find(i=>i.seccod==s.seccod).valor;
+        }
+        catch
+        {
+            refSecao=0;
+        }
+        try
+        {
+            comSecao = comparativo.Find(i=>i.seccod==s.seccod).valor;
+        }
+        catch
+        {
+            comSecao=0;
+        }
+        try
+        {
+            divSecao = comSecao/refSecao-1;
+        }
+        catch
+        {
+            divSecao=0;
+        }
+        relatorios.Add(new Relatorio(s.seccod, s.secdes, refSecao.ToString("c2"), comSecao.ToString("c2"),(comSecao-refSecao).ToString("c2") , ((divSecao)).ToString("p")));
+        totalRef+=refSecao;
+        totalCom+=comSecao;
+    }
+    if(loja=="000000")
+    {
+    	for(int i=1; i<7; i++)
+    	{
+            recargaRef += (decimal) c.totalRecarga(inicialRef,finalRef, i.ToString("000000"));
+            recargaCom += (decimal) c.totalRecarga(inicialCom, finalCom, i.ToString("000000"));
+            taxaRef += (decimal) c.totalTaxa(inicialRef,finalRef, i.ToString("000000"));
+            taxaCom += (decimal) c.totalTaxa(inicialCom, finalCom,i.ToString("000000"));
+            cancelamentoRef += (decimal) c.totalCancelamento(inicialRef,finalRef, i.ToString("000000"));
+            cancelamentoCom += (decimal) c.totalCancelamento(inicialCom,finalCom, i.ToString("000000"));
+    	}
+    }
+    else 
+    {
+        recargaRef = (decimal) c.totalRecarga(inicialRef,finalRef, loja);
+        recargaCom = (decimal) c.totalRecarga(inicialCom, finalCom, loja);
+        taxaRef = (decimal) c.totalTaxa(inicialRef,finalRef, loja);
+        taxaCom = (decimal) c.totalTaxa(inicialCom, finalCom,loja);
+        cancelamentoRef = (decimal) c.totalCancelamento(inicialRef,finalRef, loja);
+        cancelamentoCom = (decimal) c.totalCancelamento(inicialCom, finalCom, loja);
+    }
+	
+    totalGeralRef = totalRef + recargaRef + taxaRef;
+    totalGeralCom = totalCom + recargaCom + taxaCom;
+
+	decimal divRecarga = 0;
+	decimal divTaxa = 0;
+	decimal divGeral = 0;
+	decimal divCanc=0;
+	decimal divTotal=0;
+	decimal divRecVen=0;
+	
+	try
+	{
+		divRecarga = recargaCom/recargaRef-1;
+	}
+	catch
+	{
+		divRecarga=0;
+	}
+
+	try
+	{
+		divTaxa = taxaCom/taxaRef-1;
+	}
+	catch
+	{
+		divTaxa=0;
+	}
+
+	try
+	{
+		divGeral = totalGeralCom/totalGeralRef-1;
+	}
+	catch
+	{
+		divGeral=0;
+	}
+
+	try
+	{
+		divCanc = cancelamentoCom/cancelamentoRef-1;
+	}
+	catch
+	{
+		divCanc=0;
+	}
+
+	try
+	{
+		divTotal = totalCom/totalRef-1;
+	}
+	catch
+	{
+		divTotal=0;
+	}
+	
+ 
+	try
+	{
+		divRecVen = (recargaCom+totalCom)/(recargaRef+totalRef)-1;
+	}
+	catch
+	{
+		divRecVen=0;
+	}
+
+	relatorios.Add(new Relatorio("", "TOTAL", totalRef.ToString("c2"), totalCom.ToString("c2"),(totalCom-totalRef).ToString("c2") , (divTotal).ToString("p")));
+    relatorios.Add(new Relatorio("", "TOTAL RECARGA", recargaRef.ToString("c2"), recargaCom.ToString("c2"),(recargaCom-recargaRef).ToString("c2") , (divRecarga).ToString("p")));
+    relatorios.Add(new Relatorio("", "TOTAL TAXA DE ENTREGA", taxaRef.ToString("c2"), taxaCom.ToString("c2"),(taxaCom-taxaRef).ToString("c2") , (divTaxa).ToString("p")));
+    relatorios.Add(new Relatorio("", "TOTAL GERAL", totalGeralRef.ToString("c2"), totalGeralCom.ToString("c2"),(totalGeralCom-totalGeralRef).ToString("c2") , (divGeral).ToString("p")));
+    relatorios.Add(new Relatorio("", "TOTAL CANCELAMENTOS", cancelamentoRef.ToString("c2"), cancelamentoCom.ToString("c2"),(cancelamentoCom-cancelamentoRef).ToString("c2") , (divCanc).ToString("p")));
+    //relatorios.Add(new Relatorio("", "TOTAL VENDA+RECARGA", (recargaRef+totalRef).ToString("c2"), (recargaCom+totalCom).ToString("c2"),((recargaCom+totalCom)-(recargaRef+totalRef)).ToString("c2") , (divCanc).ToString("p")));
+
+    int cont=0;
+}
+
+<h1> <a href="@Href("~/Default.cshtml")" class="btn btn-small btn-primary"> 
+<img alt="(85)86266479 - Aerton" height="120px" width="220px" src="~/content/images/logoEmpresa.png"/> 
+</a> Comparativo de Vendas Por Se&ccedil&atildeo - @lojaStr</h1>
+
+<table class="table table-bordered">
+@foreach(Relatorio r in relatorios)
+{
+    if(cont==0){
+    <tr>
+        <th>@r.seccod</th>
+        <th>@r.secdes</th>
+        <th>@r.referencia</th>
+        <th>@r.comparacao</th>
+        <th>@r.diferencaValor</th>
+        <th>@r.diferencaPerc</th>
+    </tr>
+        
+    } else {
+    <tr>
+        <td @if(cont>15){<text> style="font-weight: bold;" </text> }>@r.seccod</td>
+        <td @if(cont>15){<text> style="font-weight: bold;" </text> }>@r.secdes</td>
+        <td style="text-align:right; @if(cont>15){<text> font-weight: bold; </text>}">@r.referencia</td>
+        <td style="text-align:right; @if(cont>15){<text> font-weight: bold; </text>}">@r.comparacao</td>
+        <td style="text-align:right; @if(cont>15){<text> font-weight: bold; </text>}">@r.diferencaValor</td>
+        <td style="text-align:right; @if(cont>15){<text> font-weight: bold; </text>}">@r.diferencaPerc</td>
+    </tr>
+    }
+    cont+=1;
+}
+</table>
+
+
+
+

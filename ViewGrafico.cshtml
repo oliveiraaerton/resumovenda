@@ -1,0 +1,173 @@
+@{
+    Layout="~/Layout/_SiteLayout.cshtml";
+
+	
+    string datainicialRef = (string) Session["datainicialRef"]; //"01/05/2018";
+    string datafinalRef = (string) Session["datafinalRef"]; //"24/05/2018";
+
+    string datainicialCom = (string) Session["datainicialCom"]; //"01/06/2018";
+    string datafinalCom = (string) Session["datafinalCom"]; //"24/06/2018";
+
+
+	string loja = (string) Session["loja"];
+
+	string lojaStr = String.Empty;
+	
+	if(loja=="000000")
+	{
+		lojaStr = "Geral";
+	}
+	else
+	{
+		switch(loja){
+			case "000001": lojaStr = "Loja Granja Portugal";break;
+			case "000002": lojaStr = "Loja Granja Lisboa";break;
+			case "000003": lojaStr = "Loja Vila Velha";break;
+			case "000004": lojaStr = "Loja Curva da Viúva";break;
+			case "000006": lojaStr = "Loja José Walter 3a Etapa";break;
+		}
+		//lojaStr = "Loja " + loja.AsInt();
+	}		
+	
+	List<String> diaadiaRef = new List<String>();
+	List<String> diaadiaCom = new List<String>();
+	
+	Random rnd = new Random();
+    Conexao c = new Conexao(loja);
+
+    DateTime inicialCom = DateTime.Parse(c.dataTostring(datainicialCom));
+    DateTime finalCom = DateTime.Parse(c.dataTostring(datafinalCom));
+
+    DateTime inicialRef = DateTime.Parse(c.dataTostring(datainicialRef));
+    DateTime finalRef = DateTime.Parse(c.dataTostring(datafinalRef));
+
+	List<Secao> secoes = c.sqlSecao();
+	
+	for (DateTime date = inicialRef; date <= finalRef; date = date.AddDays(1.0)){
+		diaadiaRef.Add(date.ToString("dd/MM/yyyy"));
+	}
+
+	for (DateTime date = inicialCom; date <= finalCom; date = date.AddDays(1.0)){
+		diaadiaCom.Add(date.ToString("dd/MM/yyyy"));
+	}	
+	
+}
+<div class="content-wrapper">
+    <div class="float-left">        
+		<h1> <a href="@Href("~/Default.cshtml")" class="btn btn-small btn-primary"> 
+		<img alt="(85)86266479 - Aerton" height="120px" width="220px" src="~/content/images/logoEmpresa.png"/> 
+		</a> Gr&aacutefico Comparativo de Vendas Por Se&ccedil&atildeo - @lojaStr</h1>
+    </div>
+</div>
+<div class="container">
+	<label>Grafico Periodo de @inicialRef.ToString("dd/MM/yyyy") a @finalRef.ToString("dd/MM/yyyy")</label>
+	<canvas id="myChart" width="1600" height="900"></canvas>
+</div>
+
+<div class="container">
+	<label>Grafico Periodo de @inicialCom.ToString("dd/MM/yyyy") a @finalCom.ToString("dd/MM/yyyy")</label>
+	<canvas id="myChart2" width="1600" height="900"></canvas>
+</div>
+
+<script>
+// Our labels along the x-axis
+var diasRef = [];
+var diasCom = [];
+
+@foreach(Secao s in secoes)
+{
+	
+	<text> var secaoRef</text><text>@s.seccod = []; </text>
+	<text> var secaoCom</text><text>@s.seccod = []; </text>
+}
+@foreach(String dia in diaadiaRef)
+{
+	<text> diasRef.push("@dia"); </text>
+	foreach(Secao s in secoes)
+	{
+		<text> secaoRef</text><text>@s.seccod</text><text>.push("@c.puxaVendaDia(loja, dia, s.seccod).ToString().Replace(",",".")"); </text>
+	}
+}
+
+@foreach(String dia in diaadiaCom)
+{
+	<text> diasCom.push("@dia"); </text>
+	foreach(Secao s in secoes)
+	{
+		<text> secaoCom</text><text>@s.seccod</text><text>.push("@c.puxaVendaDia(loja, dia, s.seccod).ToString().Replace(",",".")"); </text>
+	}
+}
+
+var ctx = document.getElementById("myChart");
+var myChart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: diasRef,
+    datasets: [
+	@foreach(Secao s in secoes)
+	{
+		rnd.Next();
+		if(s.seccod=="20"){
+		<text>
+			{ 
+			  data: secaoRef</text><text>@s.seccod,
+			  label: "@s.secdes",
+			  borderColor: "@c.randomcolor(rnd)",
+			  fill: false
+			}		
+		</text>
+		} else 
+		{
+		<text>
+		{ 
+		  data: secaoRef</text><text>@s.seccod,
+		  label: "@s.secdes",
+		  borderColor: "@c.randomcolor(rnd)",
+		  fill: false
+		},
+		</text>
+		}
+	}
+    ]
+  }
+});
+
+
+var ctx = document.getElementById("myChart2");
+var myChart2 = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: diasCom,
+    datasets: [
+	@foreach(Secao s in secoes)
+	{
+		rnd.Next();
+		if(s.seccod=="20"){
+		<text>
+			{ 
+			  data: secaoCom</text><text>@s.seccod,
+			  label: "@s.secdes",
+			  borderColor: "@c.randomcolor(rnd)",
+			  fill: false
+			}		
+		</text>
+		} else 
+		{
+		<text>
+		{ 
+		  data: secaoCom</text><text>@s.seccod,
+		  label: "@s.secdes",
+		  borderColor: "@c.randomcolor(rnd)",
+		  fill: false
+		},
+		</text>
+		}
+	}
+    ]
+  }
+});
+
+</script>
+
+
+

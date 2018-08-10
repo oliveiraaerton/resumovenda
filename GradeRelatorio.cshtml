@@ -1,0 +1,131 @@
+@{
+    List<RelatorioCompra> rel = (List<RelatorioCompra>) Session["relatorio"];
+    Layout="~/Layout/_SiteLayout.cshtml";   
+    string loja =Session["loja"].ToString();
+    DateTime datainicial = DateTime.Parse(Session["datainicial"].ToString());
+    DateTime datafinal =  DateTime.Parse(Session["datafinal"].ToString());
+    double tcompra = 0d;
+    double tvenda = 0d;
+    double tentrada = 0d;
+    double tsaida = 0d;
+    double tefetiva = 0d;
+    double tcliente = 0d;
+    double tmeta = 0d;
+    double tdesvio = 0d;
+    double trazao = 0d;
+    double tcgeral = 0d;
+
+}
+<STYLE>
+    .inverte{
+        background-color: Black;
+        color:  White;
+        
+    }
+    th, td{
+        font-size: 12px;
+    }
+
+	body{
+		font-name: 'Arial Narrow';
+	}
+	.cabecalho{
+		font-size: 10px;
+		width: 200px;		
+	}
+
+	.semborda{
+		border: 0px solid;
+	}
+	.valor {
+		background-color: LightGray; color: Black; font-size:12px; text-align: center;
+	}	
+	.resumo {
+		background-color: black; color: white; font-size:12px; text-align: center;
+	}
+	
+</style>
+
+<h3 class="inverte">Relatório de Compra x Venda</h3>
+	@if(loja!="000000"){
+	<h4>Filtros: Loja: @loja  Período de: @datainicial.ToString("dd/MM/yyyy") até @datafinal.ToString("dd/MM/yyyy")</h4>
+	} else {
+	<h4>Filtros: Loja: CONSOLIDADO Período de: @datainicial.ToString("dd/MM/yyyy") até @datafinal.ToString("dd/MM/yyyy")</h4>
+	}
+<table class="table table-bordered">
+    <tr class="inverte">
+        <th>Código</th>
+        <th>Descrição</th>
+        <th>Compra Geral</th>
+        <th>Venda Parceiro</th>
+        <th>Entrada Transf.</th>
+        <th>Saída Transf.</th>
+        <th>Compra Efetiva</th>
+        <th>Venda Cliente</th>
+        <th>Meta Compra</th>
+        <th>Desvio</th>
+        <th>C/V (Efetiva)(%)</th>
+        <th>C/V (Geral)(%)</th>
+    </tr>
+    @foreach(var rr in rel)
+    {
+        if(rr.Descricao.Contains("TRADICIONAL"))
+        {
+            rr.Descricao="PADARIA TRAD.";
+        }
+        if(rr.Descricao.Contains("DA CASA"))
+        {
+            rr.Descricao="PAD. DA CASA";
+        }
+        tcompra+=Double.Parse(rr.CompraGeral);
+        tvenda+=Double.Parse(rr.VendaParceiro);
+        tentrada+=Double.Parse(rr.EntradaTransferencia);
+        tsaida+=Double.Parse(rr.SaidaTransferencia);
+        tefetiva+=Double.Parse(rr.CompraEfetiva);
+        tcliente+=Double.Parse(rr.VendaCliente);
+        tmeta+=Double.Parse(rr.MetaCompra);
+        tdesvio+=Double.Parse(rr.Desvio);
+        tcgeral+=((Double.Parse(rr.CompraGeral)-Double.Parse(rr.VendaParceiro))/Double.Parse(rr.VendaCliente));
+        if(tcliente>0)
+        {
+            trazao=tefetiva/tcliente*100;
+        }
+        //trazao+=Double.Parse(rr.CompraSobreVenda);
+        <tr>
+            <td>@rr.Codigo</td>
+            <td>@rr.Descricao</td>
+            <td style="text-align: right;">@rr.CompraGeral</td>
+            <td style="text-align: right;">@rr.VendaParceiro</td>
+            <td style="text-align: right;">@rr.EntradaTransferencia</td>
+            <td style="text-align: right;">@rr.SaidaTransferencia</td>
+            <td style="text-align: right;">@rr.CompraEfetiva</td>
+            <td style="text-align: right;">@rr.VendaCliente</td>
+            <td style="text-align: right;">@rr.MetaCompra</td>
+            <td style="text-align: right;">@rr.Desvio</td>
+            <td style="text-align: right;">@rr.CompraSobreVenda %</td>
+            <td style="text-align: right;">@(((Double.Parse(rr.CompraGeral)-Double.Parse(rr.VendaParceiro))/Double.Parse(rr.VendaCliente)*100).ToString("n2")) %</td>
+        </tr>        
+    }
+    <tr class="inverte">
+        <td></td>
+        <td style="text-align: right;">Totais</td>
+        <td style="text-align: right;">@string.Format("{0:n2}", tcompra)</td>
+        <td style="text-align: right;">@string.Format("{0:n2}", tvenda)</td>
+        <td style="text-align: right;">@string.Format("{0:n2}", tentrada)</td>
+        <td style="text-align: right;">@string.Format("{0:n2}", tsaida)</td>
+        <td style="text-align: right;">@string.Format("{0:n2}", tefetiva)</td>
+        <td style="text-align: right;">@string.Format("{0:n2}", tcliente)</td>
+        <td style="text-align: right;">@string.Format("{0:n2}", tmeta)</td>
+        <td style="text-align: right;">@string.Format("{0:n2}", tdesvio)</td>
+        <td style="text-align: right;">@string.Format("{0:n2}", tefetiva/tcliente*100) %</td>
+        <td style="text-align: right;">@string.Format("{0:n2}", (tcompra-tvenda)/tcliente*100) %</td>
+    </tr>
+</table>
+<table class="table" style="width: 30%;">
+	<tr>
+		<td class="inverte">TOTAL COMPRA GERAL - VENDA PARCEIRO</td>
+	</tr>
+	<tr>
+		<td>@string.Format("{0:n2}", tcompra-tvenda)</td>
+	</tr>
+</table>

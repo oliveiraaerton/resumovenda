@@ -1,0 +1,12 @@
+@{     
+  	for(int i=1; i<7; i++) 
+ 	{
+	  	if(i!=5)
+	  	{
+			Conexao c = new Conexao(i.ToString("000000"));
+			c.gravarDiaria(i.ToString("000000"), DateTime.Parse(Request.QueryString["dias"])); 
+		}     
+           
+	}
+	Response.Redirect("~/ListarDias.cshtml");
+}

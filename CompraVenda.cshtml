@@ -1,0 +1,37 @@
+@{
+    Layout="~/Layout/_SiteLayout.cshtml";   
+}
+
+<style>
+    .center{
+        text-align: center;
+    }
+</style>
+
+<div class="col-sm-5 btn-success">
+	<h1><span class="center">Relat&oacute;rio de Compra X Venda</span></h1>
+	<form action="~/GravaRelatorio.cshtml" method="post">
+		<div class="form-group">
+			<label for="loja">Loja</label>
+			<select id="loja" name="loja" class="form-control" required>
+				<option value="">Escolha a loja</option>
+				<option value="000000">GERAL</option>
+				<option value="000001">LOJA 01</option>
+				<option value="000002">LOJA 02</option>
+				<option value="000003">LOJA 03</option>    
+				<option value="000004">LOJA 04</option>   
+				<option value="000006">LOJA 06</option>   
+			</select>
+		</div>
+		<div class="form-group">
+			<label for="datainicial">De:</label>
+			<input type="date" class="form-control" id="datainicial" name="datainicial" placeholder="Digite a Data Inicial" required>
+		</div>
+		<div class="form-group">
+			<label for="datafinal">At&eacute;:</label>
+			<input type="date" class="form-control" id="datafinal" name="datafinal" placeholder="Digite a Data Final" required>
+		</div>  
+		<button type="submit" class="btn btn-default">GERAR RELAT&Oacute;RIO</button>
+		<br/><br/>
+	</form>
+</div>

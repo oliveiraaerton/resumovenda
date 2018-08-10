@@ -1,0 +1,308 @@
+@{
+    Layout="~/Layout/_SiteLayout.cshtml";   	
+    Conexao c = new Conexao();
+    DateTime inicial = DateTime.Parse((string)Session["datainicial"]);
+    DateTime final = inicial.AddDays(6);
+    int loja = Int32.Parse((string) Session["loja"]);
+
+    decimal somaVenda = 0;
+    decimal somaCompra = 0;
+    decimal somaQuebra = 0;
+    decimal somaDiferenca = 0;
+    decimal valorCompra = 0;
+    decimal valorVenda = 0;
+    decimal valorQuebra = 0;
+    decimal percentual = 0;
+    decimal diferenca = 0;
+}
+
+		<div class="container col-md-12" style="top: -50px; z-index: -100;">
+			<center><strong>	 
+			<h4>RELATÓRIO COMPARATIVO DE COMPRA (X) VENDA (X) QUEBRA</h4>
+			PERÍODO DE ANÁLISE: Dia @inicial.ToString("dd/MM/yyyy") a @final.ToString("dd/MM/yyyy")</strong></center>
+			<table class="table">
+				<tr>
+					<th colspan="10" class="text-center">FLV LOJA @(loja==0?"TODAS":loja.ToString("00"))</th>
+				</tr>
+				<tr>
+					<th>OPERA&Ccedil&AtildeO</th>
+					@for(int i=0; i<7;i++)
+					{
+						<th>@inicial.AddDays(i).ToString("ddd").ToUpper().Replace("-FEIRA","") (@inicial.AddDays(i).ToString("dd/MM"))</th>
+					}
+					<th>TOTAL</th>
+					<th>Total da Semana</th>
+				</tr>
+				<tr>
+					<td>COMPRA</td>
+					@for(int i=0; i<7; i++)
+					{
+						valorCompra = c.retornaCompraLoja(@inicial.AddDays(i), @inicial.AddDays(i), loja.ToString("000000"), "100");
+						somaCompra+= valorCompra;
+						<td class="text-right">@valorCompra.ToString("c")</td>
+					}
+					<th class="text-right">@somaCompra.ToString("c")</th>
+					<td>Compra (X) Venda</td>
+				</tr>
+				<tr>
+					<td>VENDA</td>
+					@for(int i=0; i<7; i++)
+					{
+						valorVenda = c.retornaValorLoja(@inicial.AddDays(i), @inicial.AddDays(i), loja.ToString("000000"), "100");
+						somaVenda+= valorVenda;
+						<td class="text-right">@valorVenda.ToString("c")</td>
+					}
+					<th class="text-right">@somaVenda.ToString("c")</th>
+					@{ 
+						try{
+							percentual = (somaVenda/somaCompra-1)*100;
+						}
+						catch{
+							percentual = 0;
+						}
+					}
+					<td rowspan="5" class="font-large text-center align-middle">@percentual.ToString("n2")%</td>
+				</tr>
+				<tr>
+					<td>SUBTOTAL</td>
+					@for(int i=0; i<7; i++)
+					{
+						valorCompra = c.retornaCompraLoja(@inicial.AddDays(i), @inicial.AddDays(i), loja.ToString("000000"), "100");
+						valorVenda = c.retornaValorLoja(@inicial.AddDays(i), @inicial.AddDays(i), loja.ToString("000000"), "100");
+						diferenca = valorVenda-valorCompra;
+						somaDiferenca+= diferenca;
+						<td class="text-right">@diferenca.ToString("c")</td>
+					}
+					<th class="text-right">@somaDiferenca.ToString("c")</th>
+					<td></td>
+	
+				</tr>	
+				<tr>
+					<td>QUEBRA</td>
+					@for(int i=0; i<7; i++)
+					{
+						valorQuebra = -1*c.retornaQuebraLoja(@inicial.AddDays(i), @inicial.AddDays(i), loja.ToString("000000"), "100");
+						somaQuebra+= valorQuebra;
+						<td class="text-right">@valorQuebra.ToString("c")</td>
+					}
+					<th class="text-right">@somaQuebra.ToString("c")</th>
+					<td></td>
+				</tr>								
+				<tr>
+					@{
+						somaCompra=0;
+						somaVenda=0;
+					}
+					<td>% C. / V.</td>
+					@for(int i=0; i<7; i++)
+					{
+						valorCompra = c.retornaCompraLoja(@inicial.AddDays(i), @inicial.AddDays(i), loja.ToString("000000"), "100");
+						valorVenda = c.retornaValorLoja(@inicial.AddDays(i), @inicial.AddDays(i), loja.ToString("000000"), "100");
+						somaVenda+=valorVenda;
+						somaCompra+=valorCompra;
+						try
+						{
+							diferenca = valorCompra/valorVenda*100;	
+						}
+						catch
+						{
+							diferenca = 0;
+						}
+						
+						<td class="text-right">@diferenca.ToString("n2")%</td>
+					}
+					@{
+						try
+						{
+							somaDiferenca = somaCompra/somaVenda*100;	
+						}
+						catch
+						{
+							somaDiferenca = 0;
+						}					
+						
+					}
+					<th class="text-right">@somaDiferenca.ToString("n2")%</th>
+					<td></td>
+				</tr>								
+				<tr>
+					@{
+						somaCompra=0;
+						somaQuebra=0;
+					}					
+					<td>% Q. / C.</td>
+					@for(int i=0; i<7; i++)
+					{
+						valorCompra = c.retornaCompraLoja(@inicial.AddDays(i), @inicial.AddDays(i), loja.ToString("000000"), "100");
+						valorQuebra = -1*c.retornaQuebraLoja(@inicial.AddDays(i), @inicial.AddDays(i), loja.ToString("000000"), "100");
+						somaQuebra+=valorQuebra;
+						somaCompra+=valorCompra;
+						diferenca =0 ;
+						try
+						{
+							diferenca = valorQuebra/valorCompra*100;
+						}
+						catch
+						{
+							diferenca = 0;
+						}						
+						<td class="text-right">@diferenca.ToString("n2")%</td>
+					}
+					@{
+						try
+						{
+							somaDiferenca = somaQuebra/somaCompra*100;						
+						}
+						catch
+						{
+							somaDiferenca = 0;
+						}
+					}
+					<th class="text-right">@somaDiferenca.ToString("n2")%</th>
+					<td></td>
+				</tr>								
+			</table>
+			<table class="table">
+				<tr>
+					<th colspan="10" class="text-center">CARNES LOJA @(loja==0?"TODAS":loja.ToString("00"))</th>
+				</tr>
+				<tr>
+					<th>OPERA&Ccedil&AtildeO</th>
+					@for(int i=0; i<7;i++)
+					{
+						<th>@inicial.AddDays(i).ToString("ddd").ToUpper().Replace("-FEIRA","") (@inicial.AddDays(i).ToString("dd/MM"))</th>
+					}
+					<th>TOTAL</th>
+					<th>Total da Semana</th>
+				</tr>
+				<tr>
+					<td>COMPRA</td>
+					@for(int i=0; i<7; i++)
+					{
+						valorCompra = c.retornaCompraLoja(@inicial.AddDays(i), @inicial.AddDays(i), loja.ToString("000000"), "09");
+						somaCompra+= valorCompra;
+						<td class="text-right">@valorCompra.ToString("c")</td>
+					}
+					<th class="text-right">@somaCompra.ToString("c")</th>
+					<td>Compra (X) Venda</td>
+				</tr>
+				<tr>
+					<td>VENDA</td>
+					@for(int i=0; i<7; i++)
+					{
+						valorVenda = c.retornaValorLoja(@inicial.AddDays(i), @inicial.AddDays(i), loja.ToString("000000"), "09");
+						somaVenda+= valorVenda;
+						<td class="text-right">@valorVenda.ToString("c")</td>
+					}
+					<th class="text-right">@somaVenda.ToString("c")</th>
+					@{ 
+						try{
+							percentual = (somaVenda/somaCompra-1)*100;
+						}
+						catch{
+							percentual = 0;
+						}
+					}
+					<td rowspan="5" class="font-large text-center align-middle">@percentual.ToString("n2")%</td>
+				</tr>
+				<tr>
+					<td>SUBTOTAL</td>
+					@for(int i=0; i<7; i++)
+					{
+						valorCompra = c.retornaCompraLoja(@inicial.AddDays(i), @inicial.AddDays(i), loja.ToString("000000"), "09");
+						valorVenda = c.retornaValorLoja(@inicial.AddDays(i), @inicial.AddDays(i), loja.ToString("000000"), "09");
+						diferenca = valorVenda-valorCompra;
+						somaDiferenca+= diferenca;
+						<td class="text-right">@diferenca.ToString("c")</td>
+					}
+					<th class="text-right">@somaDiferenca.ToString("c")</th>
+					<td></td>
+	
+				</tr>	
+				<tr>
+					<td>QUEBRA</td>
+					@for(int i=0; i<7; i++)
+					{
+						valorQuebra = -1*c.retornaQuebraLoja(@inicial.AddDays(i), @inicial.AddDays(i), loja.ToString("000000"), "09");
+						somaQuebra+= valorQuebra;
+						<td class="text-right">@valorQuebra.ToString("c")</td>
+					}
+					<th class="text-right">@somaQuebra.ToString("c")</th>
+					<td></td>
+				</tr>								
+				<tr>
+					@{
+						somaCompra=0;
+						somaVenda=0;
+					}
+					<td>% C. / V.</td>
+					@for(int i=0; i<7; i++)
+					{
+						valorCompra = c.retornaCompraLoja(@inicial.AddDays(i), @inicial.AddDays(i), loja.ToString("000000"), "09");
+						valorVenda = c.retornaValorLoja(@inicial.AddDays(i), @inicial.AddDays(i), loja.ToString("000000"), "09");
+						somaVenda+=valorVenda;
+						somaCompra+=valorCompra;
+						try
+						{
+							diferenca = valorCompra/valorVenda*100;
+						}
+						catch
+						{
+							diferenca = 0;
+						}
+
+						<td class="text-right">@diferenca.ToString("n2")%</td>
+					}
+					@{
+						try
+						{
+							somaDiferenca = somaCompra/somaVenda*100;
+						}
+						catch
+						{
+							somaDiferenca = 0;
+						}
+					}
+					<th class="text-right">@somaDiferenca.ToString("n2")%</th>
+					<td></td>
+				</tr>								
+				<tr>
+					@{
+						somaCompra=0;
+						somaQuebra=0;
+					}					
+					<td>% Q. / C.</td>
+					@for(int i=0; i<7; i++)
+					{
+						valorCompra = c.retornaCompraLoja(@inicial.AddDays(i), @inicial.AddDays(i), loja.ToString("000000"), "09");
+						valorQuebra = -1*c.retornaQuebraLoja(@inicial.AddDays(i), @inicial.AddDays(i), loja.ToString("000000"), "09");
+						somaQuebra+=valorQuebra;
+						somaCompra+=valorCompra;
+						diferenca =0 ;
+						try
+						{
+							diferenca = valorQuebra/valorCompra*100;
+						}
+						catch
+						{
+							diferenca = 0;
+						}						
+						<td class="text-right">@diferenca.ToString("n2")%</td>
+					}
+					@{
+						try
+						{
+							somaDiferenca = somaQuebra/somaCompra*100;						
+						}
+						catch
+						{
+							somaDiferenca = 0;
+						}
+					}
+					<th class="text-right">@somaDiferenca.ToString("n2")%</th>
+					<td></td>
+				</tr>								
+			</table>
+		</div>
+
+	

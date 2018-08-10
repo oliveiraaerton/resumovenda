@@ -1,0 +1,22 @@
+@{
+    Layout="~/Layout/_SiteLayout.cshtml";
+    if(IsPost){
+        Conexao c = new Conexao("000000");
+        c.regravarVenda(DateTime.Parse(Request["dia"]));
+        Response.Redirect("~/Default.cshtml");
+    }
+}
+<h1>Gravar Venda Diária</h1>
+<form method="post">
+    <div class="form-group">
+        <label>Data de Geração</label>
+        <input type="date" name="dia" id="dia" required /></br>
+        <button type="submit" class="btn btn-large btn-warning">Regerar Venda Diária</button>
+        <a href="@Href("~/Default.cshtml")" class="btn btn-large btn-warning">Voltar</a> <hr/>
+    </div>
+</form>
+<script>
+    var x = document.getElementById("dia");
+    x.value = '@DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd")';
+</script>
+

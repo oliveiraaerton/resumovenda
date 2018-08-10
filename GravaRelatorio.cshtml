@@ -1,0 +1,116 @@
+@{
+    Conexao c = new Conexao();
+    
+    string loja = Request["loja"];
+    string datainicial = Request["datainicial"];
+    string datafinal = Request["datafinal"];
+    List<Secao> secoes = c.ListaSecao();
+    
+    
+    decimal compraGeral = 0;
+    decimal vendaParceiro = 0;
+    decimal entradaTransferencia = 0;
+    decimal saidaTransferencia = 0;
+    decimal compraEfetiva = 0;
+    decimal vendaCliente = 0;
+    decimal metaCompra = 0;
+    decimal desvio = 0;
+    decimal compraSobreVenda = 0;
+    
+    List<RelatorioCompra> rel = new List<RelatorioCompra>();
+    foreach(var s in secoes)
+    {
+        RelatorioCompra r = new RelatorioCompra();
+        r.Codigo = s.seccod;
+        r.DataRelatorio = datainicial;
+        r.Descricao = s.secdes;
+        try
+        {
+            compraGeral = c.retornaCompraLoja(DateTime.Parse(datainicial), DateTime.Parse(datafinal), loja, s.seccod);
+        }
+        catch (Exception ex){
+            compraGeral = 0;
+        }
+        try
+        {
+            vendaParceiro = c.retornaVendaParceiroLoja(DateTime.Parse(datainicial), DateTime.Parse(datafinal), loja, s.seccod);
+        }
+        catch{
+            vendaParceiro = 0;
+        }
+        try
+        {
+            entradaTransferencia = c.retornaEntradaTransferenciaLoja(DateTime.Parse(datainicial), DateTime.Parse(datafinal), loja, s.seccod);
+        }
+        catch{
+            entradaTransferencia = 0;
+        }
+        try
+        {
+            saidaTransferencia = c.retornaSaidaTransferenciaLoja(DateTime.Parse(datainicial), DateTime.Parse(datafinal), loja, s.seccod);
+        }
+        catch{
+            saidaTransferencia = 0;
+        }
+        try
+        {
+            compraEfetiva = compraGeral - vendaParceiro + entradaTransferencia - saidaTransferencia;
+        }
+        catch{
+            compraEfetiva = 0;
+        }
+        try
+        {
+            vendaCliente = c.retornaValorLoja(DateTime.Parse(datainicial), DateTime.Parse(datafinal), loja, s.seccod);
+        }
+        catch{
+            vendaCliente = 0;
+        }
+        try
+        {
+            metaCompra = vendaCliente * 0.75m;
+        }
+        catch{
+            metaCompra = 0;
+        }
+        try
+        {
+            desvio = metaCompra - compraEfetiva;
+        }
+        catch{
+            desvio = 0;
+        }
+        try
+        {
+            if(vendaCliente>0)
+            {
+                compraSobreVenda = (compraEfetiva/vendaCliente)*100;    
+            }
+            else
+            {
+                compraSobreVenda = 0;
+            }
+            
+        }
+        catch{
+            compraSobreVenda = 0;
+        }
+        r.CompraEfetiva = String.Format("{0:n2}", compraEfetiva);
+        r.CompraGeral = String.Format("{0:n2}", compraGeral);
+        r.CompraSobreVenda = String.Format("{0:n2}", compraSobreVenda);
+        r.Desvio = String.Format("{0:n2}", desvio);
+        r.EntradaTransferencia = String.Format("{0:n2}", entradaTransferencia);
+        r.MetaCompra = String.Format("{0:n2}", metaCompra);
+        r.SaidaTransferencia = String.Format("{0:n2}", saidaTransferencia);
+        r.VendaCliente = String.Format("{0:n2}", vendaCliente);
+        r.VendaParceiro = String.Format("{0:n2}", vendaParceiro);
+        rel.Add(r);
+    }
+    
+    Session["relatorio"] = rel;
+    Session["loja"] = loja;
+    Session["datainicial"] = datainicial;
+    Session["datafinal"] = datafinal;
+    Response.Redirect("~/GradeRelatorio.cshtml");
+    
+}
